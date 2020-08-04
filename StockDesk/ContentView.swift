@@ -40,6 +40,9 @@ struct ContentView: View {
                 }
             }
             .navigationBarTitle("StockDesk")
+            .navigationBarItems(trailing: Button("Add") {
+                
+            })
         }
     }
 }
