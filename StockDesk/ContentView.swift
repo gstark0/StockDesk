@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showModal = false
+    
     var body: some View {
         NavigationView {
             List {
@@ -41,8 +43,11 @@ struct ContentView: View {
             }
             .navigationBarTitle("StockDesk")
             .navigationBarItems(trailing: Button("Add") {
-                
+                self.showModal = true
             })
+            .sheet(isPresented: $showModal) {
+                AddStock()
+            }
         }
     }
 }
