@@ -10,7 +10,37 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        NavigationView {
+            List {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        Text("AAPL")
+                            .font(.system(size: 21))
+                            .bold()
+                        Text("Apple Inc")
+                            .font(.subheadline)
+                            .foregroundColor(Color.gray)
+                        Spacer()
+                    }
+                    Spacer()
+                    VStack {
+                        Spacer()
+                        Text("1482.76")
+                            .padding(.bottom, 5)
+                        Text("-0.3488%")
+                            .font(.subheadline)
+                            .bold()
+                            .padding(5)
+                            .background(Color.red)
+                            .foregroundColor(Color.white)
+                            .cornerRadius(5)
+                        Spacer()
+                    }
+                }
+            }
+            .navigationBarTitle("StockDesk")
+        }
     }
 }
 
