@@ -8,10 +8,19 @@
 
 import SwiftUI
 
+struct Company: Hashable {
+    var symbol: String
+    var name: String
+    var price: String
+    var change: String
+}
+
 struct ContentView: View {
     @State private var showModal = false
     @State private var newSymbol = ""
-    @State private var symbols = ["AAPL"]
+    @State private var companies:[Company] = []
+    
+    let apiKey = "ST8LDHI0C2SY672P"
     
     var body: some View {
         NavigationView {
@@ -24,15 +33,19 @@ struct ContentView: View {
                         .cornerRadius(6)
                         .padding(.horizontal)
                     Button("Add") {
-                        
+                        self.companies.append(Company(symbol: self.newSymbol, name: "Company", price: "0.00", change: "0.00"))
+                        self.getCompanyData(symbol: self.newSymbol, finished: { newCompany in
+                            self.companies[self.companies.count-1] = newCompany
+                        })
+                        self.newSymbol = ""
                     }
                     .padding(.trailing, 20)
                 }
-                List {
+                List(companies, id: \.self) { company in
                     HStack {
                         VStack(alignment: .leading) {
                             Spacer()
-                            Text("AAPL")
+                            Text(company.symbol)
                                 .font(.system(size: 21))
                                 .bold()
                             Text("Apple Inc")
@@ -43,9 +56,9 @@ struct ContentView: View {
                         Spacer()
                         VStack {
                             Spacer()
-                            Text("1482,76")
+                            Text(company.price)
                                 .padding(.bottom, 5)
-                            Text("-0.3488%")
+                            Text(company.change)
                                 .font(.subheadline)
                                 .bold()
                                 .padding(5)
@@ -65,6 +78,43 @@ struct ContentView: View {
                 }*/
             }
         }
+    }
+    
+    func getCompanyData(symbol: String, finished: @escaping (Company) -> Void) {
+        let priceUrl = URL(string: "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=\(symbol)&apikey=\(apiKey)")!
+        var companyData = Company(symbol: symbol, name: "Apple Inc", price: "0.00", change: "0.00")
+        URLSession.shared.dataTask(with: priceUrl) { data, response, error in
+            do {
+                let pricesData = try JSONDecoder().decode(ApiResponse.self, from: data!)
+                print(pricesData.globalQuote.price)
+                companyData.price = pricesData.globalQuote.price
+                companyData.change = pricesData.globalQuote.change
+            } catch {
+                print("Something went wrong!")
+            }
+            
+            finished(companyData)
+        }.resume()
+    }
+}
+
+struct ApiResponse: Codable {
+    var globalQuote: GlobalQuote
+    
+    enum CodingKeys: String, CodingKey {
+        case globalQuote = "Global Quote"
+    }
+}
+
+struct GlobalQuote: Codable {
+    var symbol: String
+    var price: String
+    var change: String
+    
+    enum CodingKeys: String, CodingKey {
+        case symbol = "01. symbol"
+        case price = "05. price"
+        case change = "10. change percent"
     }
 }
 
