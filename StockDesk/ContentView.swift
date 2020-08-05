@@ -62,7 +62,7 @@ struct ContentView: View {
                                 .font(.subheadline)
                                 .bold()
                                 .padding(5)
-                                .background(Color.red)
+                                .background(company.change.contains("-") ? Color.red : Color.green)
                                 .foregroundColor(Color.white)
                                 .cornerRadius(5)
                             Spacer()
