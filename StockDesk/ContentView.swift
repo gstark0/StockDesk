@@ -35,6 +35,7 @@ struct ContentView: View {
                         .cornerRadius(6)
                         .padding(.horizontal)
                     Button("Add") {
+                        self.newSymbol = self.newSymbol.uppercased()
                         self.companies.append(Company(symbol: self.newSymbol, name: "Company", price: "0.00", change: "0.00"))
                         self.getCompanyData(symbol: self.newSymbol, finished: { newCompany in
                             self.companies[self.companies.count-1] = newCompany
@@ -43,34 +44,36 @@ struct ContentView: View {
                     }
                     .padding(.trailing, 20)
                     .alert(isPresented: $showingAlert) {
-                        Alert(title: Text("Symbol error"), message: Text("Sorry, symbol you provided couldn't be found"))
+                        Alert(title: Text("Symbol not found"), message: Text("Sorry, symbol you provided couldn't be found!"))
                     }
                 }
-                List(companies, id: \.self) { company in
-                    HStack {
-                        VStack(alignment: .leading) {
+                List {
+                    ForEach(companies, id: \.self) { company in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Spacer()
+                                Text(company.symbol)
+                                    .font(.system(size: 21))
+                                    .bold()
+                                Text("Apple Inc")
+                                    .font(.subheadline)
+                                    .foregroundColor(Color.gray)
+                                Spacer()
+                            }
                             Spacer()
-                            Text(company.symbol)
-                                .font(.system(size: 21))
-                                .bold()
-                            Text("Apple Inc")
-                                .font(.subheadline)
-                                .foregroundColor(Color.gray)
-                            Spacer()
-                        }
-                        Spacer()
-                        VStack {
-                            Spacer()
-                            Text(company.price)
-                                .padding(.bottom, 5)
-                            Text(company.change)
-                                .font(.subheadline)
-                                .bold()
-                                .padding(5)
-                                .background(company.change.contains("-") ? Color.red : Color.green)
-                                .foregroundColor(Color.white)
-                                .cornerRadius(5)
-                            Spacer()
+                            VStack {
+                                Spacer()
+                                Text(company.price)
+                                    .padding(.bottom, 5)
+                                Text(company.change)
+                                    .font(.subheadline)
+                                    .bold()
+                                    .padding(5)
+                                    .background(company.change.contains("-") ? Color.red : Color.green)
+                                    .foregroundColor(Color.white)
+                                    .cornerRadius(5)
+                                Spacer()
+                            }
                         }
                     }
                 }
