@@ -35,7 +35,8 @@ struct ContentView: View {
                         .cornerRadius(6)
                         .padding(.horizontal)
                     Button("Add") {
-                        self.newSymbol = self.newSymbol.uppercased()
+                        self.newSymbol = self.newSymbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        if self.newSymbol.contains(" ") {self.newSymbol = ""; return}
                         self.companies.append(Company(symbol: self.newSymbol, name: "Company", price: "0.00", change: "0.00"))
                         self.getCompanyData(symbol: self.newSymbol, finished: { newCompany in
                             self.companies[self.companies.count-1] = newCompany
@@ -76,6 +77,7 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .onDelete(perform: self.deleteCompany)
                 }
                 .navigationBarTitle("StockDesk")
                 /*.navigationBarItems(trailing: Button("Add") {
@@ -86,6 +88,10 @@ struct ContentView: View {
                 }*/
             }
         }
+    }
+    
+    func deleteCompany(at offsets: IndexSet) {
+        companies.remove(atOffsets: offsets)
     }
     
     func getCompanyData(symbol: String, finished: @escaping (Company) -> Void) {
