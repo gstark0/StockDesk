@@ -20,6 +20,8 @@ struct ContentView: View {
     @State private var newSymbol = ""
     @State private var companies:[Company] = []
     
+    @State private var showingAlert = false
+    
     let apiKey = "ST8LDHI0C2SY672P"
     
     var body: some View {
@@ -40,6 +42,9 @@ struct ContentView: View {
                         self.newSymbol = ""
                     }
                     .padding(.trailing, 20)
+                    .alert(isPresented: $showingAlert) {
+                        Alert(title: Text("Symbol error"), message: Text("Sorry, symbol you provided couldn't be found"))
+                    }
                 }
                 List(companies, id: \.self) { company in
                     HStack {
@@ -89,11 +94,13 @@ struct ContentView: View {
                 print(pricesData.globalQuote.price)
                 companyData.price = pricesData.globalQuote.price
                 companyData.change = pricesData.globalQuote.change
+                finished(companyData)
             } catch {
                 print("Something went wrong!")
+                self.showingAlert = true
+                self.companies.removeLast()
             }
             
-            finished(companyData)
         }.resume()
     }
 }
