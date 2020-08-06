@@ -8,12 +8,6 @@
 
 import SwiftUI
 
-struct Company: Hashable {
-    var symbol: String
-    var name: String
-    var price: String
-    var change: String
-}
 
 struct ContentView: View {
     @State private var showModal = false
@@ -42,6 +36,7 @@ struct ContentView: View {
                             self.companies[self.companies.count-1] = newCompany
                         })
                         self.newSymbol = ""
+                        
                     }
                     .padding(.trailing, 20)
                     .alert(isPresented: $showingAlert) {
@@ -111,26 +106,6 @@ struct ContentView: View {
             }
             
         }.resume()
-    }
-}
-
-struct ApiResponse: Codable {
-    var globalQuote: GlobalQuote
-    
-    enum CodingKeys: String, CodingKey {
-        case globalQuote = "Global Quote"
-    }
-}
-
-struct GlobalQuote: Codable {
-    var symbol: String
-    var price: String
-    var change: String
-    
-    enum CodingKeys: String, CodingKey {
-        case symbol = "01. symbol"
-        case price = "05. price"
-        case change = "10. change percent"
     }
 }
 
