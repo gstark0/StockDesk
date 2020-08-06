@@ -10,13 +10,17 @@ import SwiftUI
 
 struct Company: Hashable {
     var symbol: String
-    var name: String
-    var price: String
-    var change: String
+    
+    var name = "Name"
+    var exchange = ""
+    var sector = ""
+    
+    var price = "0.00"
+    var change = "0.00"
 }
 
 // API
-struct ApiResponse: Codable {
+struct PricesResponse: Codable {
     var globalQuote: GlobalQuote
     
     enum CodingKeys: String, CodingKey {
@@ -34,4 +38,10 @@ struct GlobalQuote: Codable {
         case price = "05. price"
         case change = "10. change percent"
     }
+}
+
+struct InfoResponse: Codable {
+    var Name: String
+    var Exchange: String
+    var Sector: String
 }

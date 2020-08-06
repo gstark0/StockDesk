@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    let apiKey = "ST8LDHI0C2SY672P"
+    static let apiKey = "ST8LDHI0C2SY672P"
     
     var body: some View {
         NavigationView {
@@ -31,10 +31,22 @@ struct ContentView: View {
                     Button("Add") {
                         self.newSymbol = self.newSymbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
                         if self.newSymbol.contains(" ") {self.newSymbol = ""; return}
-                        self.companies.append(Company(symbol: self.newSymbol, name: "Company", price: "0.00", change: "0.00"))
-                        self.getCompanyData(symbol: self.newSymbol, finished: { newCompany in
-                            self.companies[self.companies.count-1] = newCompany
+                        self.companies.append(Company(symbol: self.newSymbol))
+                        
+                        // Fetch prices
+                        self.fetchPrices(symbol: self.newSymbol, finished: { newPrice, newChange in
+                            self.companies[self.companies.count-1].price = newPrice
+                            self.companies[self.companies.count-1].change = newChange
                         })
+                        
+                        //Fetch info
+                        self.fetchCompanyInfo(symbol: self.newSymbol, finished: { sector, exchange, name in
+                            print("WORKS #2")
+                            self.companies[self.companies.count-1].name = name
+                            self.companies[self.companies.count-1].exchange = exchange
+                            self.companies[self.companies.count-1].name = sector
+                        })
+                        
                         self.newSymbol = ""
                         
                     }
@@ -51,7 +63,7 @@ struct ContentView: View {
                                 Text(company.symbol)
                                     .font(.system(size: 21))
                                     .bold()
-                                Text("Apple Inc")
+                                Text(company.name)
                                     .font(.subheadline)
                                     .foregroundColor(Color.gray)
                                 Spacer()
@@ -89,16 +101,25 @@ struct ContentView: View {
         companies.remove(atOffsets: offsets)
     }
     
-    func getCompanyData(symbol: String, finished: @escaping (Company) -> Void) {
-        let priceUrl = URL(string: "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=\(symbol)&apikey=\(apiKey)")!
-        var companyData = Company(symbol: symbol, name: "Apple Inc", price: "0.00", change: "0.00")
+    func fetchCompanyInfo(symbol: String, finished: @escaping (String, String, String) -> Void) {
+        let infoUrl = URL(string: "https://www.alphavantage.co/query?function=OVERVIEW&symbol=\(symbol)&apikey=\(ContentView.apiKey))")!
+        URLSession.shared.dataTask(with: infoUrl) { data, response, error in
+            do {
+                let companyData = try JSONDecoder().decode(InfoResponse.self, from: data!)
+                print(companyData.Name)
+                finished(companyData.Name, companyData.Exchange, companyData.Sector)
+            } catch {
+                print("Error loading company info")
+            }
+        }.resume()
+    }
+    
+    func fetchPrices(symbol: String, finished: @escaping (String, String) -> Void) {
+        let priceUrl = URL(string: "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=\(symbol)&apikey=\(ContentView.apiKey)")!
         URLSession.shared.dataTask(with: priceUrl) { data, response, error in
             do {
-                let pricesData = try JSONDecoder().decode(ApiResponse.self, from: data!)
-                print(pricesData.globalQuote.price)
-                companyData.price = pricesData.globalQuote.price
-                companyData.change = pricesData.globalQuote.change
-                finished(companyData)
+                let pricesData = try JSONDecoder().decode(PricesResponse.self, from: data!)
+                finished(pricesData.globalQuote.price, pricesData.globalQuote.change)
             } catch {
                 print("Something went wrong!")
                 self.showingAlert = true
