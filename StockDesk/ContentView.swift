@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    static let apiKey = "ST8LDHI0C2SY672P"
+    static let apiKey = ""
     
     var body: some View {
         NavigationView {
